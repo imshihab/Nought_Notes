@@ -78,3 +78,139 @@ body {
 .drag {
     -webkit-app-region: drag !important;
 }
+
+.toast-box {
+    box-shadow: 0 1px 3px 0 rgba(60, 64, 67, .3), 0 4px 8px 3px rgba(60, 64, 67, .15);
+    font-family: "Google Sans", Roboto, RobotoDraft, Helvetica, Arial, sans-serif;
+    font-size: .875rem;
+    letter-spacing: normal;
+    align-items: center;
+    background-color: rgb(32, 33, 36);
+    border: none;
+    border-radius: 4px;
+    bottom: 0;
+    color: #fff;
+    display: flex !important;
+    font-weight: 400;
+    left: 0;
+    margin: 24px;
+    max-width: 640px;
+    min-height: 52px;
+    padding: 0px 0px !important;
+    position: fixed;
+    right: auto;
+    text-align: left;
+    top: auto;
+    white-space: normal;
+    z-index: 99999;
+    transform: translateY(150%);
+    transition: transform 0.3s ease-out;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    background-color: #242320;
+}
+
+.toast-box.show {
+    transform: translateY(0);
+}
+
+.toast-box.success {
+    background-color: #36c450;
+}
+
+.toast-box.error {
+    background-color: #e5282a;
+}
+
+.toast-box.warning {
+    background-color: #f0ad4e;
+}
+
+.toast-container {
+    display: flex;
+    -webkit-box-flex: 1;
+    -webkit-flex-grow: 1;
+    -ms-flex-positive: 1;
+    flex-grow: 1;
+    align-items: center;
+    position: relative;
+    min-height: 36px !important;
+    padding: 0px 16px;
+}
+
+.close-toast,
+.toast-icon {
+    margin-right: 8px;
+    height: 36px !important;
+    width: 36px !important;
+    min-height: 36px !important;
+    min-width: 36px !important;
+    max-height: 36px !important;
+    max-width: 36px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toast-box:not(.error, .success)>.toast-container>.toast-icon {
+    display: none !important;
+}
+
+.close-toast {
+    margin: 0 !important;
+    border: none !important;
+    background: none !important;
+    outline: none !important;
+    margin-right: 8px !important;
+    cursor: pointer !important;
+}
+
+.close-toast>svg,
+.toast-icon>svg {
+    height: 24px !important;
+    width: 24px !important;
+    min-height: 24px !important;
+    min-width: 24px !important;
+    max-height: 24px !important;
+    max-width: 24px !important;
+}
+
+.toast-message {
+    margin: 10px 0 !important;
+    margin-right: 24px !important;
+}
+
+#viewNoteBtn {
+    background-color: transparent;
+    color: #242320;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin-left: 24px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.3s ease-out, color 0.3s ease-out;
+}
+
+#viewNoteBtn:hover {
+    background-color: #242320;
+    color: #bb86fc;
+}
+
+.toast-action-button {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-left: 16px;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.3s ease-out;
+}
+
+.toast-action-button:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
