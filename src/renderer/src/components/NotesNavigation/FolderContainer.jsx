@@ -3,7 +3,7 @@ import { useLocation } from "react-router"
 import FolderItem from "./FolderItem"
 import NewFolderModal from "./NewFolderModel"
 
-function FolderContainer({ reload, setReload }) {
+function FolderContainer({ reload, setReload, setActiveFolder }) {
     const location = useLocation()
     const isRoot = location.pathname === "/"
     const [folders, setFolders] = useState([])
@@ -40,7 +40,7 @@ function FolderContainer({ reload, setReload }) {
                         {[...folders]
                             .sort((a, b) => (a.id === "0000000" ? -1 : b.id === "0000000" ? 1 : 0))
                             .map(({ name, id }) => (
-                                <FolderItem name={name} id={id} key={id} />
+                                <FolderItem name={name} id={id} key={id} setActiveFolder={setActiveFolder} />
                             ))}
                     </div>
                 </div>

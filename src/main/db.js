@@ -1,6 +1,25 @@
 import path from "path"
 import fs from "fs"
+import readline from "readline";
 import { ipcMain } from "electron"
+
+async function readFirstThreeLines(filePath) {
+    const fileStream = fs.createReadStream(filePath);
+    const rl = readline.createInterface({
+        input: fileStream,
+        crlfDelay: Infinity,
+    });
+    const lines = [];
+    for await (const line of rl) {
+        lines.push(line);
+        if (lines.length === 3) {
+            rl.close();
+            fileStream.destroy();
+            break;
+        }
+    }
+    return lines;
+}
 
 export default function DataBase() {
     const DataBasePath = path.join(__dirname, "./../DataBase")
@@ -64,4 +83,53 @@ export default function DataBase() {
             }
         }
     })
+
+    ipcMain.handle("fetch_notes", async (event, folderName, uid) => {
+        const FolderNotesFolderPath = path.join(NotesFolderPath, folderName);
+        const uidFolderPath = path.join(FolderNotesFolderPath, `uid_${uid}`);
+        if (!fs.existsSync(uidFolderPath)) {
+            return {
+                status: "fail",
+                message: `${folderName} with id:[${uid}] folder not found`,
+            };
+        }
+
+        try {
+            const files = await fs.promises.readdir(FolderNotesFolderPath);
+            const notes = files.filter((file) => file.endsWith(".md"));
+            const noteDetails = await Promise.all(
+                notes.map(async (note) => {
+                    const filePath = path.join(FolderNotesFolderPath, note);
+                    const firstLines = await readFirstThreeLines(filePath);
+                    const title =
+                        firstLines[0].split("title:")[1].trim() || "Untitled";
+                    const body = firstLines[2]?.trim() || "No additional text";
+
+                    const stats = fs.statSync(filePath);
+                    const created = stats.birthtime.toISOString();
+                    const edited = stats.mtime.toISOString();
+
+                    return {
+                        noteID: note.replace(".md", ""),
+                        folder: folderName,
+                        uid: uid,
+                        title: title,
+                        body: body,
+                        created: created,
+                        edited: edited,
+                    };
+                })
+            );
+            return {
+                status: "success",
+                message: "Notes fetched successfully",
+                data: noteDetails
+            };
+        } catch (error) {
+            return {
+                status: "fail",
+                message: `Error fetching notes from ${folderName}: ${error.message}`
+            };
+        }
+    });
 }

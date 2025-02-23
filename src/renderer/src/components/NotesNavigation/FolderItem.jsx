@@ -1,12 +1,15 @@
 import React, { useState, useEffect, useRef } from "react"
-import { NavLink } from "react-router"
+import { useNavigate } from "react-router"
 import { createPortal } from "react-dom"
 import toast from "../Libs/toast"
+import { set } from "esmls"
 
-function FolderItem({ name, id }) {
+function FolderItem({ name, id, setActiveFolder }) {
+
     const [contextMenu, setContextMenu] = useState({ show: false, x: 0, y: 0 })
     const menuRef = useRef(null)
     const [menuDimensions, setMenuDimensions] = useState({ width: 150, height: 100 })
+    const navigate = useNavigate()
 
     // Update menu dimensions when it renders
     useEffect(() => {
@@ -104,7 +107,6 @@ function FolderItem({ name, id }) {
                 >
                     Delete
                 </button>
-                {/* Add more menu items as needed */}
             </div>,
             document.body
         )
@@ -115,9 +117,13 @@ function FolderItem({ name, id }) {
             role="treeitem"
             className="rounded-xl overflow-hidden min-h-[44px]"
         >
-            <NavLink
-                to={`/Folder/${id}`}
+            <button
                 id={`Folder_${id}`}
+                onClick={() => {
+                    set("isActive", { name: name, uid: id });
+                    setActiveFolder({ name: name, uid: id });
+                    navigate(`/Folder/${id}`)
+                }}
                 className="all-unset w-full px-4 pr-3 h-11 text-base font-normal rounded-xl font-[Helvetica Neue] flex items-center transition-colors duration-300 hover:bg-[#74748040]"
                 onContextMenu={id !== "0000000" ? handleContextMenu : null}
             >
@@ -141,7 +147,7 @@ function FolderItem({ name, id }) {
                         {name}
                     </span>
                 </div>
-            </NavLink>
+            </button>
             {contextMenuElement}
         </div>
     )

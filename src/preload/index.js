@@ -14,7 +14,9 @@ const api = {
 
 const folders = {
     fetch: () => ipcRenderer.invoke("fetch_folders"),
-    create: (folderName) => ipcRenderer.invoke("create_folder", folderName)
+    create: (folderName) => ipcRenderer.invoke("create_folder", folderName),
+    notes: (folderName, uid) =>
+        ipcRenderer.invoke("fetch_notes", folderName, uid),
 }
 
 if (process.contextIsolated) {
