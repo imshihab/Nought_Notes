@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from "react"
 import toast from "../Libs/toast"
 
-export default function NewFolderModal({ isOpen, onClose }) {
+export default function NewFolderModal({ isOpen, onClose, onFinish }) {
     const [folderName, setFolderName] = useState("")
     const maxChars = 32
     const inputRef = useRef(null)
@@ -35,6 +35,7 @@ export default function NewFolderModal({ isOpen, onClose }) {
             toast(newFolder.message, "error")
             return
         }
+        onFinish()
         setFolderName("")
         onClose()
     }
@@ -42,7 +43,14 @@ export default function NewFolderModal({ isOpen, onClose }) {
     if (!isOpen) return null
 
     return (
-        <div className="fixed top-0 left-0 w-[100svw] h-[100svh] bg-[#00000080] backdrop-blur-sm flex justify-center items-center z-[1000]">
+        <div
+            className="fixed top-0 left-0 w-[100svw] h-[100svh] bg-[#00000080] flex justify-center items-center z-[1000]"
+            onClick={(e) => {
+                if (e.target === e.currentTarget) {
+                    onClose()
+                }
+            }}
+        >
             <div className="bg-white flex flex-col gap-4 rounded-[24px] p-6 w-[90%] max-w-[400px] shadow-[0_1px_3px_0_rgba(0,0,0,0.1),0_4px_8px_3px_rgba(0,0,0,0.1)] animate-fadeIn">
                 <h3 className="text-[24px] font-[500] text-[#242a31] overflow-hidden whitespace-nowrap text-ellipsis">
                     New Folder

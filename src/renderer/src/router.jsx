@@ -23,7 +23,7 @@ const router = createBrowserRouter([
     },
     {
         path: '*', // wildcard
-        Component: ErrorPage
+        Component: App
     }
 ])
 
