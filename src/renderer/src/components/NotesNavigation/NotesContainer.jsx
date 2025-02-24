@@ -35,7 +35,7 @@ function NotesContainer({ notes }) {
                     </span>
                 </div>
             </div>
-            <div className="relative isolate w-full h-auto overflow-hidden py-2 flex flex-col gap-2">
+            <div className="relative isolate w-full h-auto overflow-hidden py-2 flex flex-col items-center gap-2">
                 {notes?.map((note) => <NoteItem note={note} key={note.noteID} />)}
             </div>
         </div>

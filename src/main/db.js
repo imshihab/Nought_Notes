@@ -38,6 +38,7 @@ export default function DataBase() {
 
             let icon = null
             let id = null
+            let Pinned = false;
 
             files.forEach((file) => {
                 if (file.startsWith("icon_")) {
@@ -46,9 +47,16 @@ export default function DataBase() {
                 if (file.startsWith("uid_")) {
                     id = file.replace("uid_", "")
                 }
+                if (file === "Pinned") {
+                    Pinned = true;
+                }
             })
 
-            return { name: folder, icon, id }
+            const folderData = { name: folder, id };
+            if (icon !== null) folderData.icon = icon;
+            if (Pinned) folderData.Pinned = Pinned;
+
+            return folderData;
         })
 
         return result
@@ -83,6 +91,74 @@ export default function DataBase() {
             }
         }
     })
+
+    ipcMain.handle("pin__folder", async (event, folderName, uid) => {
+        const FolderNotesFolderPath = path.join(NotesFolderPath, folderName);
+        const uidFolderPath = path.join(FolderNotesFolderPath, `uid_${uid}`);
+        const pinnedPath = path.join(FolderNotesFolderPath, "Pinned");
+
+        if (!fs.existsSync(uidFolderPath)) {
+            return {
+                status: "fail",
+                message: `${folderName} with id:[${uid}] folder not found`,
+            };
+        }
+
+        try {
+            if (!fs.existsSync(pinnedPath)) {
+                await fs.promises.mkdir(pinnedPath);
+                return {
+                    status: "success",
+                    message: "Folder pinned successfully"
+                };
+            } else {
+                await fs.promises.rmdir(pinnedPath, { recursive: true });
+                return {
+                    status: "success",
+                    message: "Folder unpinned successfully"
+                };
+            }
+        } catch (error) {
+            return {
+                status: "fail",
+                message: `Error pinning folder: ${error.message}`
+            };
+        }
+    })
+
+
+    ipcMain.handle("rename__folder", async (event, name, uid, folderName) => {
+        const FolderNotesFolderPath = path.join(NotesFolderPath, name);
+        const uidFolderPath = path.join(FolderNotesFolderPath, `uid_${uid}`);
+        const reNameFolder = path.join(NotesFolderPath, folderName);
+
+        if (!fs.existsSync(uidFolderPath)) {
+            return {
+                status: "fail",
+                message: `${name} with id:[${uid}] folder not found`,
+            };
+        }
+
+        if (fs.existsSync(reNameFolder)) {
+            return {
+                status: "fail",
+                message: `A folder with name "${folderName}" already exists`,
+            };
+        }
+
+        try {
+            await fs.promises.rename(FolderNotesFolderPath, reNameFolder);
+            return {
+                status: "success",
+                message: `Folder renamed from ${name} to ${folderName} successfully`
+            };
+        } catch (error) {
+            return {
+                status: "fail",
+                message: `Error renaming folder: ${error.message}`
+            };
+        }
+    });
 
     ipcMain.handle("fetch_notes", async (event, folderName, uid) => {
         const FolderNotesFolderPath = path.join(NotesFolderPath, folderName);

@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from "react"
+import { createPortal } from "react-dom"
 import toast from "../Libs/toast"
 
-export default function NewFolderModal({ isOpen, onClose, onFinish }) {
+export default function FolderModel({ text, placeholder, isOpen, onClose, onFinish, btnText }) {
     const [folderName, setFolderName] = useState("")
     const maxChars = 32
     const inputRef = useRef(null)
@@ -25,24 +26,13 @@ export default function NewFolderModal({ isOpen, onClose, onFinish }) {
 
     const handleSubmit = async (e) => {
         e.preventDefault()
-
-        const newFolder = await window.folders.create(folderName)
-        if (newFolder.status === "success") {
-            toast(newFolder.message)
-        }
-
-        if (newFolder.status === "fail") {
-            toast(newFolder.message, "error")
-            return
-        }
-        onFinish()
+        onFinish(folderName)
         setFolderName("")
-        onClose()
     }
 
     if (!isOpen) return null
 
-    return (
+    return createPortal(
         <div
             className="fixed top-0 left-0 w-[100svw] h-[100svh] bg-[#00000080] flex justify-center items-center z-[1000]"
             onClick={(e) => {
@@ -53,7 +43,7 @@ export default function NewFolderModal({ isOpen, onClose, onFinish }) {
         >
             <div className="bg-white flex flex-col gap-4 rounded-[24px] p-6 w-[90%] max-w-[400px] shadow-[0_1px_3px_0_rgba(0,0,0,0.1),0_4px_8px_3px_rgba(0,0,0,0.1)] animate-fadeIn">
                 <h3 className="text-[24px] font-[500] text-[#242a31] overflow-hidden whitespace-nowrap text-ellipsis">
-                    New Folder
+                    {text}
                 </h3>
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4 relative">
                     <input
@@ -62,7 +52,7 @@ export default function NewFolderModal({ isOpen, onClose, onFinish }) {
                         value={folderName}
                         onChange={handleInputChange}
                         onKeyDown={handleKeyDown}
-                        placeholder="Enter folder name"
+                        placeholder={placeholder}
                         required
                         ref={inputRef}
                     />
@@ -80,18 +70,18 @@ export default function NewFolderModal({ isOpen, onClose, onFinish }) {
                         </button>
                         <button
                             type="submit"
-                            className={`px-5 py-2 rounded-[24px] font-medium transition-all duration-200 ${
-                                folderName
-                                    ? "text-white bg-[#0b57d0] hover:bg-[#0946a7] cursor-pointer"
-                                    : "bg-gray-200 text-gray-400 cursor-not-allowed"
-                            }`}
+                            className={`px-5 py-2 rounded-[24px] font-medium transition-all duration-200 ${folderName
+                                ? "text-white bg-[#0b57d0] hover:bg-[#0946a7] cursor-pointer"
+                                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                                }`}
                             disabled={!folderName}
                         >
-                            Create
+                            {btnText}
                         </button>
                     </div>
                 </form>
             </div>
-        </div>
+        </div>,
+        document.body
     )
 }

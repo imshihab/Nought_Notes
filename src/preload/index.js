@@ -17,6 +17,9 @@ const folders = {
     create: (folderName) => ipcRenderer.invoke("create_folder", folderName),
     notes: (folderName, uid) =>
         ipcRenderer.invoke("fetch_notes", folderName, uid),
+    pinFolder: (folderName, uid) =>
+        ipcRenderer.invoke("pin__folder", folderName, uid),
+    rename: (name, uid, folderName) => ipcRenderer.invoke("rename__folder", name, uid, folderName),
 }
 
 if (process.contextIsolated) {

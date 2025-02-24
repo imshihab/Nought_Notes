@@ -22,11 +22,13 @@ function NotesNavigation({ reload, setReload }) {
         onChange("isActive", async (newVal) => {
             if (newVal === null) return;
             FetchNotes(newVal, setNotes);
+            const { name, uid } = newVal;
 
             if (name === "Archives" && uid === "0000000") {
                 // ToDo: Fetch Archives
                 return;
             }
+
             if (name === "Favorites" && uid === "0000000") {
                 // ToDo: Fetch Favorites
                 return;

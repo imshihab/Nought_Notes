@@ -2,11 +2,9 @@ import React, { useState } from "react"
 import Sidebar from "./components/SideBar"
 import TopBar from "./components/TopBar"
 import NotesNavigation from "./components/NotesNavigation/NotesNavigation"
-import { get } from "esmls";
 
 function App() {
     const [reload, setReload] = useState(0);
-    // const [activeFolder, setActiveFolder] = useState(get("isActive") || { name: "", uid: "" });
     return (
         <>
             <Sidebar />
