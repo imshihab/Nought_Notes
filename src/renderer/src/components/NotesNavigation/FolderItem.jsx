@@ -4,8 +4,7 @@ import { createPortal } from "react-dom"
 import toast from "../Libs/toast"
 import { set } from "esmls"
 
-function FolderItem({ name, id, setActiveFolder }) {
-
+function FolderItem({ name, id }) {
     const [contextMenu, setContextMenu] = useState({ show: false, x: 0, y: 0 })
     const menuRef = useRef(null)
     const [menuDimensions, setMenuDimensions] = useState({ width: 150, height: 100 })
@@ -121,7 +120,6 @@ function FolderItem({ name, id, setActiveFolder }) {
                 id={`Folder_${id}`}
                 onClick={() => {
                     set("isActive", { name: name, uid: id });
-                    setActiveFolder({ name: name, uid: id });
                     navigate(`/Folder/${id}`)
                 }}
                 className="all-unset w-full px-4 pr-3 h-11 text-base font-normal rounded-xl font-[Helvetica Neue] flex items-center transition-colors duration-300 hover:bg-[#74748040]"

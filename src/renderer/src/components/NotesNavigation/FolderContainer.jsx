@@ -40,7 +40,7 @@ function FolderContainer({ reload, setReload, setActiveFolder }) {
                         {[...folders]
                             .sort((a, b) => (a.id === "0000000" ? -1 : b.id === "0000000" ? 1 : 0))
                             .map(({ name, id }) => (
-                                <FolderItem name={name} id={id} key={id} setActiveFolder={setActiveFolder} />
+                                <FolderItem name={name} id={id} key={id} />
                             ))}
                     </div>
                 </div>

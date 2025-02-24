@@ -6,14 +6,14 @@ import { get } from "esmls";
 
 function App() {
     const [reload, setReload] = useState(0);
-    const [activeFolder, setActiveFolder] = useState(get("isActive") || { name: "", uid: "" });
+    // const [activeFolder, setActiveFolder] = useState(get("isActive") || { name: "", uid: "" });
     return (
         <>
-            <Sidebar setActiveFolder={setActiveFolder} activeFolder={activeFolder} />
+            <Sidebar />
             <div className="flex flex-col flex-1">
                 <TopBar />
                 <div className="flex flex-1 rounded-t-[24px] px-2 gap-2 pt-2 m-0 bg-[#f2faff]">
-                    <NotesNavigation reload={reload} setReload={setReload} activeFolder={setActiveFolder} setActiveFolder={setActiveFolder} />
+                    <NotesNavigation reload={reload} setReload={setReload} />
                 </div>
             </div>
         </>

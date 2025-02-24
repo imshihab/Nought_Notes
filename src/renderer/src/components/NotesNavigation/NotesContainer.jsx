@@ -1,10 +1,10 @@
 import React from "react"
 import { useLocation, useNavigate } from "react-router"
 import NoteItem from "./NoteItem"
-import { del } from "esmls"
+import { del, get } from "esmls"
 
 
-function NotesContainer({ notes, activeFolder, setActiveFolder }) {
+function NotesContainer({ notes }) {
     const location = useLocation()
     const navigate = useNavigate()
 
@@ -17,7 +17,6 @@ function NotesContainer({ notes, activeFolder, setActiveFolder }) {
                     <button
                         onClick={() => {
                             navigate("/")
-                            setActiveFolder({ name: "", uid: "" })
                             del("isActive")
                         }}
                         className="all-unset flex justify-center items-center h-[40px] w-[40px] cursor-pointer rounded hover:bg-black/[0.073] active:bg-black/[0.086] active:translate-y-[1px] transition-[background-color,transform] duration-200 ease-in-out"
@@ -27,7 +26,9 @@ function NotesContainer({ notes, activeFolder, setActiveFolder }) {
                         </svg>
                     </button>
                 </div>
-                <div className="folder__title leading-[52px] truncate overflow-x-hidden whitespace-nowrap h-[52px] px-3 cursor-default font-['Helvetica_Neue',sans-serif] text-base font-semibold">{activeFolder.name}</div>
+                <div className="folder__title leading-[52px] truncate overflow-x-hidden whitespace-nowrap h-[52px] px-3 cursor-default font-['Helvetica_Neue',sans-serif] text-base font-semibold">
+                    {get("isActive")?.name}
+                </div>
                 <div className="flex items-center h-[52px] justify-end">
                     <span className="folder__title-count text-xs text-black/60 font-medium px-2 bg-[#f5f5f5] rounded-xl inline-block align-middle h-6 leading-6">
                         {notes?.length}
