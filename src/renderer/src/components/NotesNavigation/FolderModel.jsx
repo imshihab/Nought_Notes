@@ -1,9 +1,8 @@
 import { useState, useEffect, useRef } from "react"
 import { createPortal } from "react-dom"
-import toast from "../Libs/toast"
 
-export default function FolderModel({ text, placeholder, isOpen, onClose, onFinish, btnText }) {
-    const [folderName, setFolderName] = useState("")
+export default function FolderModel({ text, placeholder, isOpen, onClose, onFinish, btnText, defval = "" }) {
+    const [folderName, setFolderName] = useState(defval)
     const maxChars = 32
     const inputRef = useRef(null)
 

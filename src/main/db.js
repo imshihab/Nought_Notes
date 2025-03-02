@@ -126,7 +126,6 @@ export default function DataBase() {
         }
     })
 
-
     ipcMain.handle("rename__folder", async (event, name, uid, folderName) => {
         const FolderNotesFolderPath = path.join(NotesFolderPath, name);
         const uidFolderPath = path.join(FolderNotesFolderPath, `uid_${uid}`);
@@ -156,6 +155,22 @@ export default function DataBase() {
             return {
                 status: "fail",
                 message: `Error renaming folder: ${error.message}`
+            };
+        }
+    });
+
+    ipcMain.handle("is_folder_empty", async (event, folderName) => {
+        const folderPath = path.join(NotesFolderPath, folderName);
+        try {
+            const files = await fs.promises.readdir(folderPath);
+            return {
+                status: "success",
+                isEmpty: files.length === 1
+            };
+        } catch (error) {
+            return {
+                status: "fail",
+                message: `Error checking folder: ${error.message}`
             };
         }
     });

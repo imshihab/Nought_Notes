@@ -4,6 +4,7 @@ import { createPortal } from "react-dom"
 import toast from "../Libs/toast"
 import { set } from "esmls"
 import FolderModel from "./FolderModel"
+import DeleteFolder from "./Model/DeleteFolder"
 
 function FolderItem({ folder, setReload }) {
     const { name, id, Pinned, icon } = folder;
@@ -12,6 +13,7 @@ function FolderItem({ folder, setReload }) {
     const [menuDimensions, setMenuDimensions] = useState({ width: 150, height: 100 })
     const navigate = useNavigate()
     const [isModalOpen, setIsModalOpen] = useState(false)
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
     // Update menu dimensions when it renders
     useEffect(() => {
@@ -120,9 +122,8 @@ function FolderItem({ folder, setReload }) {
                 </button>
                 <button
                     className="px-4 py-2 text-left hover:bg-gray-100 flex items-center gap-2 cursor-pointer"
-                    onClick={async () => {
-                        toast(`${name} ${id}`)
-
+                    onClick={() => {
+                        setIsDeleteModalOpen(true);
                         setContextMenu({ show: false, x: 0, y: 0 })
                     }}
                 >
@@ -182,6 +183,7 @@ function FolderItem({ folder, setReload }) {
                 text="Rename Folder"
                 placeholder="Enter folder name"
                 btnText="Rename"
+                defval={name}
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
                 onFinish={async (folderName) => {
@@ -197,6 +199,21 @@ function FolderItem({ folder, setReload }) {
                     }
                     setIsModalOpen(false);
                 }}
+            />
+            <DeleteFolder
+                folderName={name}
+                isDeleteModalOpen={isDeleteModalOpen}
+                onDelete={async () => {
+                    const result = await window.folders.delete(name, id);
+                    if (result.status === "success") {
+                        toast(result.message);
+                        setReload((pre) => pre + 1);
+                    } else {
+                        toast(result.message, "error");
+                    }
+                    setIsDeleteModalOpen(false);
+                }}
+                onClose={() => setIsDeleteModalOpen(false)}
             />
         </div>
     )
