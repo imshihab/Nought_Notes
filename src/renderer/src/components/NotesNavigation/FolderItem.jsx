@@ -154,7 +154,8 @@ const FolderItem = ({ folder, setReload }) => {
                     navigate(`/Folder/${id}`)
                 }}
                 className="all-unset cursor-pointer w-full px-4 pr-3 h-11 text-base font-normal rounded-xl font-[Helvetica Neue] flex items-center transition-colors duration-300 hover:bg-[#74748040]"
-                onContextMenu={id !== "0000000" ? handleContextMenu : null}
+
+                onContextMenu={id !== "0000000" ? handleContextMenu : () => { document.dispatchEvent(new Event("closeAllContextMenus")) }}
             >
                 <div className="flex items-center w-full gap-3 min-w-0 flex-1 min-[inline-size:1px]">
                     <span className="inline-flex items-center justify-center flex-shrink-0 w-[30px] h-8">

@@ -26,6 +26,10 @@ const folders = {
 const Notes = {
     pinNote: (folderName, uid, noteID) =>
         ipcRenderer.invoke("pin__note", folderName, uid, noteID),
+    archive: (folderName, uid, noteID) =>
+        ipcRenderer.invoke("archive__note", folderName, uid, noteID),
+    unarchive: (folderName, uid, noteID) =>
+        ipcRenderer.invoke("unarchive__note", folderName, uid, noteID),
 }
 
 if (process.contextIsolated) {

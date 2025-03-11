@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, memo } from "react"
 import Sidebar from "./components/SideBar"
 import TopBar from "./components/TopBar"
 import NotesNavigation from "./components/NotesNavigation/NotesNavigation"
@@ -18,4 +18,4 @@ function App() {
     )
 }
 
-export default App
+export default memo(App)

@@ -246,4 +246,89 @@ export default function DataBase() {
         }
     })
 
+    ipcMain.handle("archive__note", async (event, folderName, uid, noteID) => {
+        const FolderNotesFolderPath = path.join(NotesFolderPath, folderName);
+        const uidFolderPath = path.join(FolderNotesFolderPath, `uid_${uid}`);
+        const notePath = path.join(FolderNotesFolderPath, `${noteID}.md`);
+        const archiveFolderPath = path.join(ArchivesFolderPath, folderName);
+        const archiveuidFolderPath = path.join(archiveFolderPath, `uid_${uid}`);
+        const archiveNotePath = path.join(archiveFolderPath, `${noteID}.md`);
+
+        try {
+            if (!fs.existsSync(notePath)) {
+                return {
+                    status: "fail",
+                    message: `Note with ID ${noteID} not found`
+                };
+            }
+
+            if (!fs.existsSync(archiveFolderPath)) {
+                await fs.promises.mkdir(archiveFolderPath, { recursive: true });
+            }
+
+            if (!fs.existsSync(archiveuidFolderPath)) {
+                await fs.promises.mkdir(archiveuidFolderPath, { recursive: true });
+            }
+
+            // Move the note to Archives maintaining folder structure
+            await fs.promises.rename(notePath, archiveNotePath);
+
+            return {
+                status: "success",
+                message: "Note archived successfully"
+            };
+        } catch (error) {
+            return {
+                status: "fail",
+                message: `Error archiving note: ${error.message}`
+            };
+        }
+    });
+
+    ipcMain.handle("unarchive__note", async (event, folderName, uid, noteID) => {
+        const FolderNotesFolderPath = path.join(NotesFolderPath, folderName);
+        const uidFolderPath = path.join(FolderNotesFolderPath, `uid_${uid}`);
+        const notePath = path.join(FolderNotesFolderPath, `${noteID}.md`);
+        const archiveFolderPath = path.join(ArchivesFolderPath, folderName);
+        const archiveuidFolderPath = path.join(archiveFolderPath, `uid_${uid}`);
+        const archiveNotePath = path.join(archiveFolderPath, `${noteID}.md`);
+
+        try {
+            // Check if note exists in Archives
+            if (!fs.existsSync(archiveNotePath)) {
+                return {
+                    status: "fail",
+                    message: `Note with ID ${noteID} not found in Archives`
+                };
+            }
+
+            // Check if destination folder exists, create if not
+            if (!fs.existsSync(FolderNotesFolderPath)) {
+                await fs.promises.mkdir(FolderNotesFolderPath, { recursive: true });
+            }
+
+            // Check if uid folder exists, create if not
+            if (!fs.existsSync(uidFolderPath)) {
+                await fs.promises.mkdir(uidFolderPath, { recursive: true });
+            }
+
+            // Move the note from Archives back to original folder
+            await fs.promises.rename(archiveNotePath, notePath);
+
+            // Clean up empty archive folders
+            const archiveFolderFiles = await fs.promises.readdir(archiveFolderPath);
+            if (archiveFolderFiles.length === 1) {
+                await fs.promises.rmdir(archiveFolderPath, { recursive: true });
+            }
+            return {
+                status: "success",
+                message: "Note unarchived successfully"
+            };
+        } catch (error) {
+            return {
+                status: "fail",
+                message: `Error unarchiving note: ${error.message}`
+            };
+        }
+    });
 }

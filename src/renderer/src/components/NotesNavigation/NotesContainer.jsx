@@ -21,7 +21,7 @@ function NotesContainer({ notes, setNotesReload, type }) {
 
     if (type === "Archives") {
         return <Index isRoot={isRoot} length={notes?.length}>
-            <ArchivesView notes={notes} />
+            <ArchivesView notes={notes} setNotesReload={setNotesReload} />
         </Index>
     }
 }
