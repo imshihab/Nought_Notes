@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect, useRef, memo } from "react"
 import { useNavigate } from "react-router"
 import { createPortal } from "react-dom"
 import toast from "../Libs/toast"
@@ -6,7 +6,7 @@ import { set } from "esmls"
 import FolderModel from "./FolderModel"
 import DeleteFolder from "./Model/DeleteFolder"
 
-function FolderItem({ folder, setReload }) {
+const FolderItem = ({ folder, setReload }) => {
     const { name, id, Pinned, icon } = folder;
     const [contextMenu, setContextMenu] = useState({ show: false, x: 0, y: 0 })
     const menuRef = useRef(null)
@@ -15,15 +15,11 @@ function FolderItem({ folder, setReload }) {
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false)
 
-    // Update menu dimensions when it renders
     useEffect(() => {
         if (contextMenu.show && menuRef.current) {
             const { offsetWidth, offsetHeight } = menuRef.current
             setMenuDimensions({ width: offsetWidth, height: offsetHeight })
         }
-    }, [contextMenu.show])
-
-    useEffect(() => {
         const handleCloseAll = () => {
             if (contextMenu.show) {
                 setContextMenu({ show: false, x: 0, y: 0 })
@@ -38,41 +34,48 @@ function FolderItem({ folder, setReload }) {
     const handleContextMenu = (event) => {
         event.preventDefault()
 
-        // Dispatch the event to close any other open context menus
-        document.dispatchEvent(new Event("closeAllContextMenus"))
-
         const windowWidth = window.innerWidth
         const windowHeight = window.innerHeight
 
         let x = event.pageX
         let y = event.pageY
 
-        // Adjust position if the menu would overflow the window
+
         if (x + menuDimensions.width > windowWidth) {
             x = windowWidth - menuDimensions.width
         }
         if (y + menuDimensions.height > windowHeight) {
             y = windowHeight - menuDimensions.height
         }
+        if (contextMenu.show && contextMenu.x === x && contextMenu.y === y) return;
 
+
+        // Dispatch the event to close any other open context menus
+        document.dispatchEvent(new Event("closeAllContextMenus"));
         setContextMenu({
             show: true,
             x,
             y
         })
     }
-
-    const handleClick = (e) => {
-        if (menuRef.current && menuRef.current.contains(e.target)) {
-            return
-        }
-        setContextMenu({ show: false, x: 0, y: 0 })
-    }
-
     useEffect(() => {
-        document.addEventListener("click", handleClick)
+        document.addEventListener("click", (e) => {
+            if (menuRef.current && menuRef.current.contains(e.target)) {
+                return;
+            }
+
+            // Dispatch the event to close any other open context menus
+            document.dispatchEvent(new Event("closeAllContextMenus"));
+        })
         return () => {
-            document.removeEventListener("click", handleClick)
+            document.removeEventListener("click", (e) => {
+                if (menuRef.current && menuRef.current.contains(e.target)) {
+                    return;
+                }
+
+                // Dispatch the event to close any other open context menus
+                document.dispatchEvent(new Event("closeAllContextMenus"));
+            })
         }
     }, [])
 
@@ -219,4 +222,4 @@ function FolderItem({ folder, setReload }) {
     )
 }
 
-export default FolderItem
+export default memo(FolderItem)

@@ -1,17 +1,23 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, memo } from "react"
 import FolderContainer from "./FolderContainer"
 import NotesContainer from "./NotesContainer"
-import { del, get, onChange } from "esmls"
+import { get, onChange } from "esmls"
+import toast from "../Libs/toast"
 
 const FetchNotes = async (isActive, setNotes) => {
     if (isActive === null) return;
     const results = await window.folders.notes(isActive.name, isActive.uid);
-    const data = results?.data;
-    setNotes(data);
+
+    if (results.status === "fail") {
+        toast(results.message);
+        return;
+    }
+
+    setNotes(results);
 }
 
 function NotesNavigation({ reload, setReload }) {
-    const [notes, setNotes] = useState([]);
+    const [notes, setNotes] = useState({});
     const [notesReload, setNotesReload] = useState(0);
 
     useEffect(() => {
@@ -23,36 +29,15 @@ function NotesNavigation({ reload, setReload }) {
         onChange("isActive", async (newVal) => {
             if (newVal === null) return;
             FetchNotes(newVal, setNotes);
-            const { name, uid } = newVal;
-
-            if (name === "Archives" && uid === "0000000") {
-                // ToDo: Fetch Archives
-                return;
-            }
-
-            if (name === "Favorites" && uid === "0000000") {
-                // ToDo: Fetch Favorites
-                return;
-            }
-
-            if (name === "Trash" && uid === "0000000") {
-                // ToDo: Fetch Trash
-                return;
-            }
-
-            if (name === "Hidden" && uid === "0000000") {
-                // ToDo: Fetch Hidden
-                return;
-            }
         })
     }, [])
 
     return (
         <div className="bg-transparent w-[320px] !min-w-[280px] !max-w-[320px] h-[calc(100vh-72px)] mt-2 rounded-t-2xl relative overflow-hidden">
             <FolderContainer reload={reload} setReload={setReload} />
-            <NotesContainer notes={notes} setNotesReload={setNotesReload} />
+            <NotesContainer type={notes.type} notes={notes.data} setNotesReload={setNotesReload} />
         </div>
     )
 }
 
-export default NotesNavigation
+export default memo(NotesNavigation)

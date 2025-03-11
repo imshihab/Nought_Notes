@@ -1,8 +1,8 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState, memo, useCallback } from "react"
 import { createPortal } from "react-dom";
-import toast from "../Libs/toast";
+import toast from "../../Libs/toast";
 
-function NoteItem({ note, setNotesReload }) {
+const NoteItem = memo(({ note, setNotesReload }) => {
     const editedDate = new Date(note.edited).toLocaleDateString("en-US", {
         year: "numeric",
         month: "short",
@@ -19,64 +19,60 @@ function NoteItem({ note, setNotesReload }) {
         minute: "numeric",
     });
 
-    const [contextMenu, setContextMenu] = useState({ show: false, x: 0, y: 0 })
-    const [menuDimensions, setMenuDimensions] = useState({ width: null, height: null })
+    const [contextMenu, setContextMenu] = useState({ show: false, x: 0, y: 0 });
     const menuRef = useRef(null);
+    const dimensionsRef = useRef({ width: 0, height: 0 });
 
-
-
-    const handleClick = (e) => {
-        if (menuRef.current && menuRef.current.contains(e.target)) {
-            return
+    const handlePinNote = useCallback(async () => {
+        const result = await window.notes.pinNote(note.folder, note.uid, note.noteID);
+        if (result.status === "success") {
+            setNotesReload((pre) => pre + 1);
+        } else if (result.status === "fail") {
+            toast(result.message, "error");
         }
-        setContextMenu({ show: false, x: 0, y: 0 })
-    }
+        setContextMenu({ show: false, x: 0, y: 0 });
+    }, [note.folder, note.uid, note.noteID, setNotesReload]);
+
+    const handleContextMenu = useCallback((event) => {
+        event.preventDefault();
+        document.dispatchEvent(new Event("closeAllContextMenus"));
+
+        if (!dimensionsRef.current.width && menuRef.current) {
+            dimensionsRef.current = {
+                width: menuRef.current.offsetWidth,
+                height: menuRef.current.offsetHeight
+            };
+        }
+
+        const { width, height } = dimensionsRef.current;
+        const windowWidth = window.innerWidth;
+        const windowHeight = window.innerHeight;
+        let x = Math.min(event.pageX, windowWidth - width);
+        let y = Math.min(event.pageY, windowHeight - height);
+
+        setContextMenu({ show: true, x, y });
+    }, []);
+
     useEffect(() => {
-        document.addEventListener("click", handleClick)
-        return () => {
-            document.removeEventListener("click", handleClick)
-        }
-    }, [])
-
-
-
-    useEffect(() => {
-        if (contextMenu.show && menuRef.current) {
-            const { offsetWidth, offsetHeight } = menuRef.current
-            setMenuDimensions({ width: offsetWidth, height: offsetHeight })
-        }
+        const handleClick = (e) => {
+            if (menuRef.current?.contains(e.target)) return;
+            setContextMenu({ show: false, x: 0, y: 0 });
+        };
 
         const handleCloseAll = () => {
-            if (contextMenu.show) {
-                setContextMenu({ show: false, x: 0, y: 0 })
-            }
+            setContextMenu({ show: false, x: 0, y: 0 });
+        };
+
+        if (contextMenu.show) {
+            document.addEventListener("click", handleClick);
+            document.addEventListener("closeAllContextMenus", handleCloseAll);
         }
-        document.addEventListener("closeAllContextMenus", handleCloseAll)
+
         return () => {
-            document.removeEventListener("closeAllContextMenus", handleCloseAll)
-        }
+            document.removeEventListener("click", handleClick);
+            document.removeEventListener("closeAllContextMenus", handleCloseAll);
+        };
     }, [contextMenu.show]);
-
-    const handleContextMenu = (event) => {
-        event.preventDefault();
-        document.dispatchEvent(new Event("closeAllContextMenus"))
-        const windowWidth = window.innerWidth
-        const windowHeight = window.innerHeight
-        let x = event.pageX
-        let y = event.pageY
-        if (x + menuDimensions.width > windowWidth) {
-            x = windowWidth - menuDimensions.width
-        }
-        if (y + menuDimensions.height > windowHeight) {
-            y = windowHeight - menuDimensions.height
-        }
-
-        setContextMenu({
-            show: true,
-            x,
-            y
-        })
-    }
 
     const contextMenuElement = contextMenu.show
         ? createPortal(
@@ -87,19 +83,7 @@ function NoteItem({ note, setNotesReload }) {
             >
                 <button
                     className="px-4 py-2 text-left hover:bg-gray-100 flex items-center gap-2 cursor-pointer"
-                    onClick={async () => {
-                        const result = await window.notes.pinNote(note.folder, note.uid, note.noteID);
-
-                        if (result.status === "success") {
-                            setNotesReload((pre) => pre + 1);
-                        }
-
-                        if (result.status === "fail") {
-                            toast(result.message, "error");
-                        }
-
-                        setContextMenu({ show: false, x: 0, y: 0 })
-                    }}
+                    onClick={handlePinNote}
                 >
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5">
                         <path d={note.Pinned ? "M8,6.2V4H7V2H17V4H16V12L18,14V16H17.8L14,12.2V4H10V8.2L8,6.2M20,20.7L18.7,22L12.8,16.1V22H11.2V16H6V14L8,12V11.3L2,5.3L3.3,4L20,20.7M8.8,14H10.6L9.7,13.1L8.8,14Z" : "M16,12V4H17V2H7V4H8V12L6,14V16H11.2V22H12.8V16H18V14L16,12M8.8,14L10,12.8V4H14V12.8L15.2,14H8.8Z"} />
@@ -131,6 +115,6 @@ function NoteItem({ note, setNotesReload }) {
             {contextMenuElement}
         </div >
     )
-}
+})
 
-export default NoteItem
+export default memo(NoteItem)

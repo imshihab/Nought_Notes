@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react"
+import { useEffect, useState, memo } from "react"
 import { createPortal } from "react-dom"
 import logo from './delete.svg'
 
-export default function FolderModel({ folderName, onDelete, onClose, isDeleteModalOpen }) {
+function FolderModel({ folderName, onDelete, onClose, isDeleteModalOpen }) {
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -50,3 +50,5 @@ export default function FolderModel({ folderName, onDelete, onClose, isDeleteMod
         document.body
     ) : null;
 }
+
+export default memo(FolderModel)

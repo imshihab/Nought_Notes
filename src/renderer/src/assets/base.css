@@ -74,6 +74,20 @@ body {
     -webkit-app-region: no-drag !important;
 }
 
+.nav-item-active::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    height: 100%;
+    background-color: #E8DEF8;
+    border-radius: 24px;
+    z-index: 0;
+    transform: translateX(-50%);
+    transition: width 0.2s ease-in-out, opacity 0.2s ease-in-out;
+    width: 56px;
+}
 
 .drag {
     -webkit-app-region: drag !important;

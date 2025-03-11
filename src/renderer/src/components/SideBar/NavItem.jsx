@@ -1,21 +1,28 @@
-import React from 'react'
-import { NavLink } from 'react-router'
+import React, { memo, useCallback } from 'react'
+import { NavLink, useNavigate } from 'react-router'
+import { get, set } from 'esmls'
 
-const NavItem = ({ to, label, activePath, inactivePath, viewBox = '0 0 24 24', onClick }) => {
+const NavItem = ({ to, name, label, activePath, inactivePath, viewBox = '0 0 24 24' }) => {
+    const navigate = useNavigate();
+
+    const handleClick = useCallback((e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (get("isActive")?.name === name) return;
+        set("isActive", { name, uid: "0000000" });
+        navigate(to);
+    }, [navigate, to, name]);
+
     return (
         <NavLink
             to={to}
-            onClick={onClick}
-            className={({ isActive }) =>
-                `flex flex-col items-center justify-start h-14 min-h-14 max-h-14 w-20 min-w-20 max-w-20 border-none outline-none bg-transparent gap-1 relative`
-            }
+            onClick={handleClick}
+            className="flex flex-col items-center justify-start h-14 min-h-14 max-h-14 w-20 min-w-20 max-w-20 border-none outline-none bg-transparent gap-1 relative"
         >
             {({ isActive }) => (
                 <>
                     <div
-                        className={`h-8 min-h-8 max-h-8 w-14 min-w-14 max-w-14 p-1 px-4 relative overflow-hidden rounded-[24px] after:content-[''] after:absolute after:top-0 after:bottom-0 after:left-1/2 after:h-full after:bg-[#E8DEF8] after:rounded-[24px] after:z-0 after:-translate-x-1/2 after:transition-[width,opacity] after:duration-200 after:ease-in-out ${isActive
-                            ? 'after:w-full after:opacity-100'
-                            : 'after:w-0 after:opacity-0'
+                        className={`h-8 min-h-8 max-h-8 w-14 min-w-14 max-w-14 p-1 px-4 relative overflow-hidden rounded-[24px] ${isActive ? 'nav-item-active' : ''
                             }`}
                     >
                         <svg
@@ -35,6 +42,6 @@ const NavItem = ({ to, label, activePath, inactivePath, viewBox = '0 0 24 24', o
             )}
         </NavLink>
     )
-}
+};
 
-export default NavItem
+export default memo(NavItem)

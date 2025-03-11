@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from "react"
+import { useState, useEffect, useRef, memo } from "react"
 import { createPortal } from "react-dom"
 
-export default function FolderModel({ text, placeholder, isOpen, onClose, onFinish, btnText, defval = "" }) {
+const FolderModel = ({ text, placeholder, isOpen, onClose, onFinish, btnText, defval = "" }) => {
     const [folderName, setFolderName] = useState(defval)
     const maxChars = 32
     const inputRef = useRef(null)
@@ -84,3 +84,5 @@ export default function FolderModel({ text, placeholder, isOpen, onClose, onFini
         document.body
     )
 }
+
+export default memo(FolderModel)
