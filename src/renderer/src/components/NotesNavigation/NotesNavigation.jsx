@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react"
 import FolderContainer from "./FolderContainer"
 import NotesContainer from "./NotesContainer"
-import { useLocation } from "react-router"
 import { del, get, onChange } from "esmls"
 
 const FetchNotes = async (isActive, setNotes) => {
@@ -13,12 +12,14 @@ const FetchNotes = async (isActive, setNotes) => {
 
 function NotesNavigation({ reload, setReload }) {
     const [notes, setNotes] = useState([]);
-
+    const [notesReload, setNotesReload] = useState(0);
 
     useEffect(() => {
         const isActive = get("isActive");
         FetchNotes(isActive, setNotes);
 
+    }, [notesReload])
+    useEffect(() => {
         onChange("isActive", async (newVal) => {
             if (newVal === null) return;
             FetchNotes(newVal, setNotes);
@@ -49,7 +50,7 @@ function NotesNavigation({ reload, setReload }) {
     return (
         <div className="bg-transparent w-[320px] !min-w-[280px] !max-w-[320px] h-[calc(100vh-72px)] mt-2 rounded-t-2xl relative overflow-hidden">
             <FolderContainer reload={reload} setReload={setReload} />
-            <NotesContainer notes={notes} />
+            <NotesContainer notes={notes} setNotesReload={setNotesReload} />
         </div>
     )
 }

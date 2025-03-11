@@ -2,17 +2,21 @@ import React from "react"
 import { useLocation, useNavigate } from "react-router"
 import NoteItem from "./NoteItem"
 import { del, get } from "esmls"
+import quickSort from "../Helper/quickSort"
 
 
-function NotesContainer({ notes }) {
+function NotesContainer({ notes, setNotesReload }) {
     const location = useLocation()
     const navigate = useNavigate()
 
     const Items = ["Folder/", "Archives", "Favorites", "Trash", "Hidden"]
     const isRoot = Items.some(item => location.pathname.startsWith(`/${item}`));
+    const pinnedNotes = notes.filter(note => note.Pinned);
+    const otherNotes = notes.filter(note => !note.Pinned);
+
     return (
-        <div className={`w-[320px] ${!isRoot ? 'translate-x-[320px]' : 'translate-x-[0px]'} h-[calc(100vh-72px)] transform-gpu absolute inset-0 overflow-y-auto overflow-x-hidden transition-transform duration-150 ease-in-out`}>
-            <div className="w-full h-[52px] box-border px-3 grid grid-cols-[minmax(max-content,1fr)_auto_minmax(max-content,1fr)] items-center sticky top-0 z-[4] bg-white">
+        <div className={`w-[320px] ${!isRoot ? 'translate-x-[320px]' : 'translate-x-[0px]'} h-[calc(100vh-72px)] transform-gpu absolute inset-0 transition-transform duration-150 ease-in-out`}>
+            <div className="w-full h-[52px] box-border px-3 grid grid-cols-[minmax(max-content,1fr)_auto_minmax(max-content,1fr)] items-center sticky top-0 z-[4]">
                 <div className="flex items-center h-[52px] justify-start">
                     <button
                         onClick={() => {
@@ -35,8 +39,15 @@ function NotesContainer({ notes }) {
                     </span>
                 </div>
             </div>
-            <div className="relative isolate w-full h-auto overflow-hidden py-2 flex flex-col items-center gap-2">
-                {notes?.map((note) => <NoteItem note={note} key={note.noteID} />)}
+            <div className="relative isolate w-full h-[calc(100vh-72px-52px)] overflow-y-auto overflow-x-hidden py-2 flex flex-col items-center gap-2">
+                {pinnedNotes.length > 0 && (
+                    <h2 className="text-left flex w-full px-[16px] text-sm font-medium text-black/60 uppercase tracking-wide">
+                        Pinned:
+                    </h2>
+                )}
+                {pinnedNotes.map((note) => <NoteItem note={note} key={note.noteID} setNotesReload={setNotesReload} />)}
+                {pinnedNotes.length > 0 && <hr className="border-t-4 w-[calc(100%-24px)] border-[#dadce0]" />}
+                {otherNotes.map((note) => <NoteItem note={note} key={note.noteID} setNotesReload={setNotesReload} />)}
             </div>
         </div>
     )

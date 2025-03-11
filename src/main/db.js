@@ -205,11 +205,17 @@ export default function DataBase() {
     ipcMain.handle("fetch_notes", async (event, folderName, uid) => {
         const FolderNotesFolderPath = path.join(NotesFolderPath, folderName);
         const uidFolderPath = path.join(FolderNotesFolderPath, `uid_${uid}`);
+        const PinnedNotesFolderPath = path.join(FolderNotesFolderPath, "PinnedNotes");
+
         if (!fs.existsSync(uidFolderPath)) {
             return {
                 status: "fail",
                 message: `${folderName} with id:[${uid}] folder not found`,
             };
+        }
+
+        if (!fs.existsSync(PinnedNotesFolderPath)) {
+            fs.mkdirSync(PinnedNotesFolderPath);
         }
 
         try {
@@ -227,6 +233,9 @@ export default function DataBase() {
                     const created = stats.birthtime.toISOString();
                     const edited = stats.mtime.toISOString();
 
+                    const isPinned = fs.existsSync(path.join(PinnedNotesFolderPath, note));
+
+
                     return {
                         noteID: note.replace(".md", ""),
                         folder: folderName,
@@ -235,6 +244,7 @@ export default function DataBase() {
                         body: body,
                         created: created,
                         edited: edited,
+                        Pinned: isPinned
                     };
                 })
             );
@@ -250,4 +260,40 @@ export default function DataBase() {
             };
         }
     });
+
+    ipcMain.handle("pin__note", async (event, folderName, uid, noteID) => {
+        const FolderNotesFolderPath = path.join(NotesFolderPath, folderName);
+        const uidFolderPath = path.join(FolderNotesFolderPath, `uid_${uid}`);
+        const PinnedNotesFolderPath = path.join(FolderNotesFolderPath, "PinnedNotes");
+        const PinnedNoteFolderPath = path.join(PinnedNotesFolderPath, `${noteID}.md`);
+
+        if (!fs.existsSync(uidFolderPath)) {
+            return {
+                status: "fail",
+                message: `${folderName} with id:[${uid}] folder not found`,
+            };
+        }
+
+        try {
+            if (!fs.existsSync(PinnedNoteFolderPath)) {
+                await fs.promises.mkdir(PinnedNoteFolderPath);
+                return {
+                    status: "success",
+                    message: "Note pinned successfully"
+                };
+            } else {
+                await fs.promises.rm(PinnedNoteFolderPath, { recursive: true });
+                return {
+                    status: "success",
+                    message: "Note unpinned successfully"
+                };
+            }
+        } catch (error) {
+            return {
+                status: "fail",
+                message: `Error pinning note: ${error.message}`
+            };
+        }
+    })
+
 }

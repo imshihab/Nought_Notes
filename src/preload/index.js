@@ -23,12 +23,17 @@ const folders = {
     isEmpty: (folderName) => ipcRenderer.invoke("is_folder_empty", folderName),
     delete: (folderName, uid) => ipcRenderer.invoke("delete__folder", folderName, uid),
 }
+const Notes = {
+    pinNote: (folderName, uid, noteID) =>
+        ipcRenderer.invoke("pin__note", folderName, uid, noteID),
+}
 
 if (process.contextIsolated) {
     try {
         contextBridge.exposeInMainWorld("electron", electronAPI)
         contextBridge.exposeInMainWorld("api", api)
         contextBridge.exposeInMainWorld("folders", folders)
+        contextBridge.exposeInMainWorld("notes", Notes)
     } catch (error) {
         console.error(error)
     }
@@ -36,4 +41,5 @@ if (process.contextIsolated) {
     window.electron = electronAPI
     window.api = api
     window.folders = folders
+    window.notes = Notes;
 }
