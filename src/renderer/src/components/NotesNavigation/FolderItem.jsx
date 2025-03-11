@@ -204,6 +204,7 @@ function FolderItem({ folder, setReload }) {
                 folderName={name}
                 isDeleteModalOpen={isDeleteModalOpen}
                 onDelete={async () => {
+                    console.log(name, id);
                     const result = await window.folders.delete(name, id);
                     if (result.status === "success") {
                         toast(result.message);

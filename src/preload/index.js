@@ -20,7 +20,8 @@ const folders = {
     pinFolder: (folderName, uid) =>
         ipcRenderer.invoke("pin__folder", folderName, uid),
     rename: (name, uid, folderName) => ipcRenderer.invoke("rename__folder", name, uid, folderName),
-    isEmpty: (folderName) => ipcRenderer.invoke("is_folder_empty", folderName)
+    isEmpty: (folderName) => ipcRenderer.invoke("is_folder_empty", folderName),
+    delete: (folderName, uid) => ipcRenderer.invoke("delete__folder", folderName, uid),
 }
 
 if (process.contextIsolated) {

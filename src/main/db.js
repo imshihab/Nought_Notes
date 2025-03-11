@@ -163,14 +163,41 @@ export default function DataBase() {
         const folderPath = path.join(NotesFolderPath, folderName);
         try {
             const files = await fs.promises.readdir(folderPath);
+            const mdFiles = files.filter(file => file.endsWith('.md'));
+
             return {
                 status: "success",
-                isEmpty: files.length === 1
+                isEmpty: mdFiles.length === 0
             };
         } catch (error) {
             return {
                 status: "fail",
                 message: `Error checking folder: ${error.message}`
+            };
+        }
+    });
+
+    ipcMain.handle("delete__folder", async (event, folderName, uid) => {
+        const FolderNotesFolderPath = path.join(NotesFolderPath, folderName);
+        const uidFolderPath = path.join(FolderNotesFolderPath, `uid_${uid}`);
+
+        if (!fs.existsSync(uidFolderPath)) {
+            return {
+                status: "fail",
+                message: `${folderName} with id:[${uid}] folder not found`,
+            };
+        }
+
+        try {
+            await fs.promises.rmdir(FolderNotesFolderPath, { recursive: true });
+            return {
+                status: "success",
+                message: `Folder ${folderName} deleted successfully`
+            };
+        } catch (error) {
+            return {
+                status: "fail",
+                message: `Error deleting folder: ${error.message}`
             };
         }
     });

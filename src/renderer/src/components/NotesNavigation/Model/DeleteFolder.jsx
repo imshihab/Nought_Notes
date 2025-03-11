@@ -7,15 +7,15 @@ export default function FolderModel({ folderName, onDelete, onClose, isDeleteMod
 
     useEffect(() => {
         (async () => {
+            if (!isDeleteModalOpen) return;
             const isEmpty = await window.folders.isEmpty(folderName);
-            if (isEmpty) {
+            if (isEmpty.isEmpty === true) {
                 onDelete();
-                onClose();
             } else {
                 setIsLoading(false);
             }
         })();
-    }, [folderName, onDelete, onClose]);
+    }, [isDeleteModalOpen]);
 
     return isDeleteModalOpen && !isLoading ? createPortal(
         <div
@@ -28,7 +28,7 @@ export default function FolderModel({ folderName, onDelete, onClose, isDeleteMod
         >
             <div className="bg-white flex flex-col items-center gap-4 rounded-[24px] p-6 w-[90%] max-w-[600px] shadow-[0_1px_3px_0_rgba(0,0,0,0.1),0_4px_8px_3px_rgba(0,0,0,0.1)] animate-fadeIn">
                 <h4 className="text-[24px] font-[500] text-[#242a31] overflow-hidden whitespace-nowrap text-ellipsis">
-                    Do you really want to delete this folder {folderName}?
+                    Do you really want to delete this folder: "{folderName}"?
                 </h4>
                 <img src={logo} className="w-2xs h-2xs" alt="Logo" />
                 <div className="flex gap-4">

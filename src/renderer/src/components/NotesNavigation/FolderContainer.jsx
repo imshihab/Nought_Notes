@@ -58,6 +58,7 @@ function FolderContainer({ reload, setReload }) {
                     if (newFolder.status === "success") {
                         toast(newFolder.message);
                         setReload((pre) => pre + 1);
+                        setIsModalOpen(false);
                     }
 
                     if (newFolder.status === "fail") {
