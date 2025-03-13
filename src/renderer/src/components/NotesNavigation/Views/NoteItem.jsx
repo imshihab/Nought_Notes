@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import toast from "../../Libs/toast";
 import date from "../../Helper/date";
 
-const NoteItem = memo(({ note, setNotesReload }) => {
+const NoteItem = memo(({ note, setNotesReload, handleClick, activeNoteId }) => {
     const editedDate = date(note.edited);
     const createdDate = date(note.created);
 
@@ -109,7 +109,12 @@ const NoteItem = memo(({ note, setNotesReload }) => {
 
 
     return (
-        <div className="box-border w-[calc(100%-20px)] mx-3 px-3 py-2 flex rounded-xl transition-all duration-200 ease-in-out bg-[#ffffff]  hover:bg-[#78788014] cursor-pointer" id={note.noteID} onContextMenu={handleContextMenu}>
+        <div
+            className={`box-border w-[calc(100%-20px)] mx-3 px-3 py-2 flex rounded-xl transition-all duration-200 ease-in-out cursor-pointer ${activeNoteId === note.noteID ? "bg-[#d0e6ff]" : "bg-transparent"}`}
+            id={note.noteID}
+            onContextMenu={handleContextMenu}
+            onClick={() => handleClick(note.noteID)}
+        >
             <div className="box-border h-full flex flex-col grow gap-[2px] overflow-hidden">
                 <div className="overflow-hidden whitespace-nowrap text-ellipsis leading-[21px] font-['Helvetica_Neue',sans-serif] text-[17px] font-semibold">{note.title}</div>
                 <div className="font-['Helvetica_Neue',sans-serif] text-[14px] font-normal text-[#000000a8] overflow-hidden whitespace-nowrap text-ellipsis flex-grow">{note.body}</div>
