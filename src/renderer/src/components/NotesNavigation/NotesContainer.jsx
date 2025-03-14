@@ -1,7 +1,7 @@
 import React from "react"
 import { useLocation, useNavigate } from "react-router"
-import Index from "./Views"
-import NotesView from "./VIews/NotesView"
+import Index from "./Views/Index"
+import NotesView from "./Views/NotesView"
 import ArchivesView from "./Views/ArchivesView"
 
 

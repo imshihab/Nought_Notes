@@ -1,11 +1,14 @@
-import React, { memo, useState } from 'react'
+import React, { memo, useState, useCallback } from 'react'
 import NoteItem from "./NoteItem"
 
-const NotesView = (({ pinnedNotes, otherNotes, setNotesReload, length }) => {
+const NotesView = memo(({ pinnedNotes, otherNotes, setNotesReload, length }) => {
     const [activeNoteId, setActiveNoteId] = useState(null);
-    const handleClick = (noteId) => {
+
+    const handleClick = useCallback((noteId) => {
+        if (activeNoteId === noteId) return;
         setActiveNoteId(noteId);
-    };
+    }, [activeNoteId]);
+
     return (
         <>
             {pinnedNotes?.length > 0 && (
@@ -19,7 +22,15 @@ const NotesView = (({ pinnedNotes, otherNotes, setNotesReload, length }) => {
                 </div>
             )}
 
-            {pinnedNotes?.map((note) => <NoteItem note={note} key={note.noteID} setNotesReload={setNotesReload} handleClick={handleClick} activeNoteId={activeNoteId} />)}
+            {pinnedNotes?.map((note) => (
+                <NoteItem
+                    note={note}
+                    key={note.noteID}
+                    setNotesReload={setNotesReload}
+                    handleClick={handleClick}
+                    isActive={note.noteID === activeNoteId}
+                />
+            ))}
 
             {pinnedNotes?.length > 0 && (
                 <div className="text-left flex items-center gap-1.5 w-full !min-h-[40px] px-[24px] tracking-wide !-my-2">
@@ -28,9 +39,17 @@ const NotesView = (({ pinnedNotes, otherNotes, setNotesReload, length }) => {
                     </span>
                 </div>
             )}
-            {otherNotes?.map((note) => <NoteItem note={note} key={note.noteID} setNotesReload={setNotesReload} handleClick={handleClick} activeNoteId={activeNoteId} />)}
+            {otherNotes?.map((note) => (
+                <NoteItem
+                    note={note}
+                    key={note.noteID}
+                    setNotesReload={setNotesReload}
+                    handleClick={handleClick}
+                    isActive={note.noteID === activeNoteId}
+                />
+            ))}
         </>
     )
-})
+});
 
-export default memo(NotesView)
+export default memo(NotesView);

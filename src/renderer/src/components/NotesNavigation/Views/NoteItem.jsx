@@ -1,80 +1,89 @@
-import React, { useEffect, useRef, useState, memo, useCallback } from "react"
+import React, { useEffect, useRef, useState, memo, useCallback, useMemo } from "react"
 import { createPortal } from "react-dom";
 import toast from "../../Libs/toast";
 import date from "../../Helper/date";
 
-const NoteItem = memo(({ note, setNotesReload, handleClick, activeNoteId }) => {
-    const editedDate = date(note.edited);
-    const createdDate = date(note.created);
+const NoteItem = memo(({ note, setNotesReload, handleClick, isActive }) => {
+    // Memoize dates since they only change when note changes
+    const dates = useMemo(() => ({
+        edited: date(note.edited),
+        created: date(note.created)
+    }), [note.edited, note.created]);
 
     const [contextMenu, setContextMenu] = useState({ show: false, x: 0, y: 0 });
-
     const menuRef = useRef(null);
     const dimensionsRef = useRef({ width: 0, height: 0 });
 
-    const handlePinNote = useCallback(async () => {
-        const result = await window.notes.pinNote(note.folder, note.uid, note.noteID);
-        if (result.status === "success") {
-            setNotesReload((pre) => pre + 1);
-        } else if (result.status === "fail") {
-            toast(result.message, "error");
-        }
+    const closeContextMenu = useCallback(() => {
         setContextMenu({ show: false, x: 0, y: 0 });
-    }, [note.folder, note.uid, note.noteID, setNotesReload]);
+    }, []);
+
+    const handlePinNote = useCallback(async () => {
+        try {
+            const result = await window.notes.pinNote(note.folder, note.uid, note.noteID);
+            if (result.status === "success") {
+                setNotesReload(pre => pre + 1);
+            } else {
+                toast(result.message, "error");
+            }
+        } finally {
+            closeContextMenu();
+        }
+    }, [note.folder, note.uid, note.noteID, setNotesReload, closeContextMenu]);
 
     const handleArchive = useCallback(async () => {
-        const result = await window.notes.archive(note.folder, note.uid, note.noteID);
-        if (result.status === "success") {
-            setNotesReload((pre) => pre + 1);
-        } else if (result.status === "fail") {
-            toast(result.message, "error");
+        try {
+            const result = await window.notes.archive(note.folder, note.uid, note.noteID);
+            if (result.status === "success") {
+                setNotesReload(pre => pre + 1);
+            } else {
+                toast(result.message, "error");
+            }
+        } finally {
+            closeContextMenu();
         }
-        setContextMenu({ show: false, x: 0, y: 0 });
-    }, [note.folder, note.uid, note.noteID, setNotesReload]);
+    }, [note.folder, note.uid, note.noteID, setNotesReload, closeContextMenu]);
 
     const handleContextMenu = useCallback((event) => {
         event.preventDefault();
         document.dispatchEvent(new Event("closeAllContextMenus"));
 
-        if (!dimensionsRef.current.width && menuRef.current) {
+        if (menuRef.current && !dimensionsRef.current.width) {
             dimensionsRef.current = {
                 width: menuRef.current.offsetWidth,
                 height: menuRef.current.offsetHeight
             };
         }
 
-        const { width, height } = dimensionsRef.current;
-        const windowWidth = window.innerWidth;
-        const windowHeight = window.innerHeight;
-        let x = Math.min(event.pageX, windowWidth - width);
-        let y = Math.min(event.pageY, windowHeight - height);
+        const { width = 144, height = 100 } = dimensionsRef.current; // Default minimum sizes
+        const x = Math.min(event.pageX, window.innerWidth - width);
+        const y = Math.min(event.pageY, window.innerHeight - height);
 
         setContextMenu({ show: true, x, y });
     }, []);
 
     useEffect(() => {
-        const handleClick = (e) => {
+        if (!contextMenu.show) return;
+
+        const handleClickOutside = (e) => {
             if (menuRef.current?.contains(e.target)) return;
-            setContextMenu({ show: false, x: 0, y: 0 });
+            closeContextMenu();
         };
 
-        const handleCloseAll = () => {
-            setContextMenu({ show: false, x: 0, y: 0 });
-        };
-
-        if (contextMenu.show) {
-            document.addEventListener("click", handleClick);
-            document.addEventListener("closeAllContextMenus", handleCloseAll);
-        }
+        document.addEventListener("click", handleClickOutside);
+        document.addEventListener("closeAllContextMenus", closeContextMenu);
 
         return () => {
-            document.removeEventListener("click", handleClick);
-            document.removeEventListener("closeAllContextMenus", handleCloseAll);
+            document.removeEventListener("click", handleClickOutside);
+            document.removeEventListener("closeAllContextMenus", closeContextMenu);
         };
-    }, [contextMenu.show]);
+    }, [contextMenu.show, closeContextMenu]);
 
-    const contextMenuElement = contextMenu.show
-        ? createPortal(
+    // Memoize the context menu to prevent unnecessary portal creation
+    const contextMenuElement = useMemo(() => {
+        if (!contextMenu.show) return null;
+
+        return createPortal(
             <div
                 ref={menuRef}
                 className="fixed bg-white flex flex-col rounded-xl shadow-[0_5px_15px_rgba(0,0,0,0.35)] min-w-[144px] py-2 z-50"
@@ -102,34 +111,44 @@ const NoteItem = memo(({ note, setNotesReload, handleClick, activeNoteId }) => {
                         Archive
                     </span>
                 </button>
-            </div >,
+            </div>,
             document.body
-        )
-        : null
+        );
+    }, [contextMenu.show, contextMenu.x, contextMenu.y, note.Pinned, handlePinNote, handleArchive]);
 
+    const handleItemClick = useCallback(() => {
+        handleClick(note.noteID);
+    }, [handleClick, note.noteID]);
 
     return (
         <div
-            className={`box-border w-[calc(100%-20px)] mx-3 px-3 py-2 flex rounded-xl transition-all duration-200 ease-in-out cursor-pointer ${activeNoteId === note.noteID ? "bg-[#d0e6ff]" : "bg-transparent"}`}
+            className={`box-border w-[calc(100%-20px)] mx-3 px-3 py-2 flex rounded-xl transition-all duration-200 ease-in-out cursor-pointer
+                ${isActive
+                    ? "bg-[#d0e6ff]"
+                    : "bg-transparent hover:bg-black/[0.05] active:bg-black/[0.08]"
+                }`}
             id={note.noteID}
             onContextMenu={handleContextMenu}
-            onClick={() => handleClick(note.noteID)}
+            onClick={handleItemClick}
         >
             <div className="box-border h-full flex flex-col grow gap-[2px] overflow-hidden">
-                <div className="overflow-hidden whitespace-nowrap text-ellipsis leading-[21px] font-['Helvetica_Neue',sans-serif] text-[17px] font-semibold">{note.title}</div>
-                <div className="font-['Helvetica_Neue',sans-serif] text-[14px] font-normal text-[#000000a8] overflow-hidden whitespace-nowrap text-ellipsis flex-grow">{note.body}</div>
+                <div className="overflow-hidden whitespace-nowrap text-ellipsis leading-[21px] font-['Helvetica_Neue',sans-serif] text-[17px] font-semibold">
+                    {note.title}
+                </div>
+                <div className="font-['Helvetica_Neue',sans-serif] text-[14px] font-normal text-[#000000a8] overflow-hidden whitespace-nowrap text-ellipsis flex-grow">
+                    {note.body}
+                </div>
                 <div
                     className="leading-[20px] mb-0 font-['Helvetica_Neue',sans-serif] text-[14px] font-normal"
-                    title={`edited: ${editedDate}\ncreated: ${createdDate}`}
+                    title={`edited: ${dates.edited}\ncreated: ${dates.created}`}
                 >
                     <span className="!mr-2">✎</span>
-                    {editedDate}
+                    {dates.edited}
                 </div>
             </div>
-
             {contextMenuElement}
-        </div >
-    )
-})
+        </div>
+    );
+});
 
 export default memo(NoteItem)
