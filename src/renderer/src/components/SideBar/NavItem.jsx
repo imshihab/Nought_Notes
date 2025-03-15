@@ -22,8 +22,7 @@ const NavItem = ({ to, name, label, activePath, inactivePath, viewBox = '0 0 24 
             {({ isActive }) => (
                 <>
                     <div
-                        className={`h-8 min-h-8 max-h-8 w-14 min-w-14 max-w-14 p-1 px-4 relative overflow-hidden rounded-[24px] ${isActive ? 'nav-item-active' : ''
-                            }`}
+                        className={`h-8 min-h-8 max-h-8 w-14 min-w-14 max-w-14 p-1 px-4 relative overflow-hidden rounded-[24px] ${isActive ? 'nav-item-active' : ''}`}
                     >
                         <svg
                             className="w-6 min-w-6 max-w-6 h-6 min-h-6 max-h-6 fill-[#4A4459] relative z-1"

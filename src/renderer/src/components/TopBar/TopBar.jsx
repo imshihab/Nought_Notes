@@ -10,7 +10,7 @@ const TopBar = () => {
 
     return (
         <div
-            className="w-full bg-white max-h-16 min-h-16 px-2 flex items-center gap-2 pr-0"
+            className="w-full bg-[#f2faff] max-h-16 min-h-16 px-2 flex items-center gap-2 pr-0"
             style={{ WebkitAppRegion: "drag" }}
         >
             <div className="flex items-center gap-2 flex-grow">

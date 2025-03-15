@@ -8,7 +8,7 @@ import ArchivesView from "./Views/ArchivesView"
 function NotesContainer({ notes, setNotesReload, type }) {
     const location = useLocation()
 
-    const Items = ["Folder/", "Archives", "Favorites", "Trash", "Hidden"]
+    const Items = ["Folder/", "Archives", "Favorites", "Trash", "Locked"]
     const isRoot = Items.some(item => location.pathname.startsWith(`/${item}`));
 
     if (type === "Notes") {

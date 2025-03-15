@@ -11,7 +11,7 @@ const initDatabase = async () => {
         if (!fs.existsSync(basePath)) {
             fs.mkdirSync(basePath, { recursive: true })
         }
-        const Folders = ["Notes", "Archives", "Favorites", "Trash", "Hidden"]
+        const Folders = ["Notes", "Archives", "Favorites", "Trash", "Locked"]
         Folders.forEach((folder) => {
             const folderPath = path.join(basePath, folder)
             if (!fs.existsSync(folderPath)) {

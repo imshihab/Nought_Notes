@@ -203,8 +203,8 @@ export default function DataBase() {
             return [];
         }
 
-        if (folderName === "Hidden" && uid === "0000000") {
-            // ToDo: Fetch Hidden
+        if (folderName === "Locked" && uid === "0000000") {
+            // ToDo: Fetch Locked
             return [];
         }
         const data = await FetchNotes(NotesFolderPath, folderName, uid);
