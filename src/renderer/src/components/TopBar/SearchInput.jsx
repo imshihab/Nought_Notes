@@ -2,7 +2,7 @@ import React, { memo } from 'react';
 
 const SearchInput = ({ value, onChange }) => {
     return (
-        <div className="relative flex items-center max-w-[720px]">
+        <div className="relative flex items-center max-w-[720px] min-w-2xs !ml-auto !mr-[8px]">
             <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="absolute left-5 w-[20px] h-[20px] text-black/60"
@@ -19,7 +19,7 @@ const SearchInput = ({ value, onChange }) => {
             <input
                 type="text"
                 placeholder="Search Notes..."
-                className="w-full h-[48px] pl-[52px] pr-5 bg-white rounded-[24px] text-base placeholder:text-black/60 outline-none border-[1px] border-transparent transition-all duration-200 ease-in-out noDrag"
+                className="w-full h-[48px] pl-[52px] pr-5 bg-slate-200 rounded-[24px] text-base placeholder:text-black/60 outline-none border-[1px] border-transparent transition-all duration-200 ease-in-out noDrag"
                 value={value}
                 onChange={onChange}
             />

@@ -40,8 +40,15 @@ const FolderContainer = ({ reload, setReload }) => {
                         className="h-[calc(100svh-72px-72px)] overflow-y-auto overflow-x-hidden py-4 px-3 flex flex-col gap-1"
                         role="tree"
                     >
-                        {sort.map((folder) => (
-                            <FolderItem folder={folder} key={folder.id} setReload={setReload} />
+                        {sort.map((folder, index) => (
+                            <FolderItem 
+                                folder={folder}
+                                key={folder.id}
+                                setReload={setReload}
+                                isFirst={index === 0}
+                                isLast={index === sort.length - 1}
+                                isSingle={sort.length === 1}
+                            />
                         ))}
                     </div>
                 </div>

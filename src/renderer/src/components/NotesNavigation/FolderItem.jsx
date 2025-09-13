@@ -6,7 +6,7 @@ import { set } from "esmls"
 import FolderModel from "./FolderModel"
 import DeleteFolder from "./Model/DeleteFolder"
 
-const FolderItem = ({ folder, setReload }) => {
+const FolderItem = ({ folder, setReload, isFirst, isLast, isSingle }) => {
     const { name, id, Pinned, icon } = folder;
     const [contextMenu, setContextMenu] = useState({ show: false, x: 0, y: 0 })
     const menuRef = useRef(null)
@@ -142,10 +142,18 @@ const FolderItem = ({ folder, setReload }) => {
         )
         : null
 
+    // Calculate border radius classes based on position
+    const getBorderRadiusClass = () => {
+        if (isSingle) return "rounded-xl";
+        if (isFirst) return "rounded-t-xl rounded-b-[6px]";
+        if (isLast) return "rounded-b-xl rounded-t-[6px]";
+        return "rounded-[6px]";
+    };
+
     return (
         <div
             role="treeitem"
-            className="rounded-xl overflow-hidden min-h-[44px]"
+            className="overflow-hidden min-h-[64px]"
         >
             <button
                 id={`Folder_${id}`}
@@ -153,27 +161,23 @@ const FolderItem = ({ folder, setReload }) => {
                     set("isActive", { name: name, uid: id });
                     navigate(`/Folder/${id}`)
                 }}
-                className="all-unset cursor-pointer w-full px-4 pr-3 h-11 text-base font-normal rounded-xl font-[Helvetica Neue] flex items-center transition-colors duration-300 hover:bg-[#74748040]"
-
+                className={`all-unset cursor-pointer w-full px-3 pr-3 h-16 text-base font-normal font-[Helvetica Neue] flex items-center transition-colors duration-300 bg-white hover:bg-[#e4e4e47e] ${getBorderRadiusClass()}`}
                 onContextMenu={id !== "0000000" ? handleContextMenu : () => { document.dispatchEvent(new Event("closeAllContextMenus")) }}
             >
                 <div className="flex items-center w-full gap-3 min-w-0 flex-1 min-[inline-size:1px]">
-                    <span className="inline-flex items-center justify-center flex-shrink-0 w-[30px] h-8">
+                    <span className="inline-flex items-center justify-center flex-shrink-0 w-12 h-12 bg-[#E8E8E8] rounded-xl">
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             width="24"
                             height="24"
                             viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
+                            fill="#5E5E5E"
+
                         >
-                            <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" />
+                            <path d="M20 6h-8l-2-2H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm0 12H4V8h16v10z" />
                         </svg>
                     </span>
-                    <span className="flex-1 whitespace-nowrap text-ellipsis overflow-hidden text-left">
+                    <span className="flex-1 whitespace-nowrap text-ellipsis overflow-hidden text-left text-[#1B1B1B] text-[16px] leading-[22px] font-[system-ui] font-normal">
                         {name}
                     </span>
                     {Pinned ? <svg viewBox="0 0 24 24" fill="#fbbc04" className="w-5 h-5" xmlns="http://www.w3.org/2000/svg">
@@ -209,13 +213,16 @@ const FolderItem = ({ folder, setReload }) => {
                 isDeleteModalOpen={isDeleteModalOpen}
                 onDelete={async () => {
                     const result = await window.folders.delete(name, id);
+                    setReload((pre) => pre + 1);
+                    setIsDeleteModalOpen(false);
+
                     if (result.status === "success") {
                         toast(result.message);
-                        setReload((pre) => pre + 1);
-                    } else {
-                        toast(result.message, "error");
                     }
-                    setIsDeleteModalOpen(false);
+
+                    if (result.status === "fail") {
+                        toast(result.message, "error")
+                    }
                 }}
                 onClose={() => setIsDeleteModalOpen(false)}
             />
@@ -224,3 +231,4 @@ const FolderItem = ({ folder, setReload }) => {
 }
 
 export default memo(FolderItem)
+
