@@ -88,7 +88,7 @@ function Index({ children, isRoot, length = 0 }) {
     const scrollbarTop = (scrollInfo.scrollTop / scrollInfo.scrollHeight) * scrollInfo.clientHeight;
 
     return (
-        <div className={`w-[320px] ${!isRoot ? 'translate-x-[320px]' : 'translate-x-[0px]'} h-[calc(100vh-64px)] transform-gpu absolute inset-0 transition-transform duration-150 ease-in-out`}>
+        <div className={`w-[296px] ${!isRoot ? 'translate-x-[296px]' : 'translate-x-[0px]'} h-[calc(100vh-64px)] transform-gpu absolute inset-0 transition-transform duration-150 ease-in-out`}>
             <div className="w-full h-[52px] box-border px-3 grid grid-cols-[minmax(max-content,1fr)_auto_minmax(max-content,1fr)] items-center sticky top-0 z-[4]">
                 <div className="flex items-center h-[52px] justify-start">
                     <button

@@ -22,7 +22,7 @@ const FolderContainer = ({ reload, setReload }) => {
     return (
         <>
             <div
-                className={`w-[320px] h-[calc(100svh-72px)] transform-gpu absolute inset-0 transition-transform duration-150 ease-in-out ${isRoot ? "translate-x-[0px]" : "translate-x-[-320px]"}`}
+                className={`w-[296px] h-[calc(100svh-72px)] transform-gpu absolute inset-0 transition-transform duration-150 ease-in-out ${isRoot ? "translate-x-[0px]" : "translate-x-[-296px]"}`}
             >
                 <div className="relative">
                     <div className="px-4 py-2 sticky top-0 z-2 h-[72px]">
@@ -37,11 +37,11 @@ const FolderContainer = ({ reload, setReload }) => {
                         </button>
                     </div>
                     <div
-                        className="h-[calc(100svh-72px-72px)] overflow-y-auto overflow-x-hidden py-4 px-3 flex flex-col gap-1"
+                        className="h-[calc(100svh-72px-72px)] overflow-y-auto overflow-x-hidden py-4 flex flex-col gap-1"
                         role="tree"
                     >
                         {sort.map((folder, index) => (
-                            <FolderItem 
+                            <FolderItem
                                 folder={folder}
                                 key={folder.id}
                                 setReload={setReload}

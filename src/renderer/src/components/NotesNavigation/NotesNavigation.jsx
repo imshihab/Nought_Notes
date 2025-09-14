@@ -33,7 +33,7 @@ function NotesNavigation({ reload, setReload }) {
     }, [])
 
     return (
-        <div className="bg-transparent w-[320px] !min-w-[280px] !max-w-[320px] h-[calc(100vh-64px)] mt-2 rounded-t-2xl relative overflow-hidden">
+        <div className="bg-transparent !w-[296px] !min-w-[280px] !max-w-[320px] h-[calc(100vh-64px)] mt-2 rounded-t-2xl relative overflow-hidden">
             <FolderContainer reload={reload} setReload={setReload} />
             <NotesContainer type={notes.type} notes={notes.data} setNotesReload={setNotesReload} />
         </div>
